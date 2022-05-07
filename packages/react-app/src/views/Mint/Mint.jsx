@@ -522,8 +522,8 @@ export default function MintPage({
   };
 
   const handleSubmit = async event => {
-    alert("A name was submitted: " + this.state.value);
     event.preventDefault();
+    // gen art first then mint
     var status = await mintItem();
   };
 
@@ -587,7 +587,7 @@ export default function MintPage({
         shape="round"
         size="large"
         onClick={() => {
-          mintItem();
+          handleSubmit();
         }}
       >
         MINT NFT

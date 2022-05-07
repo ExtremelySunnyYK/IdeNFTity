@@ -6,8 +6,9 @@ import { Link, Route, Switch, useLocation } from "react-router-dom";
 
 export default function Header({ link, title, subTitle }) {
   const location = useLocation();
-  return (
-    <Menu style={{ }} selectedKeys={[location.pathname]} mode="horizontal">
+  //position:"fixed",width:"100%" 
+  return (  
+    <Menu style={{}} selectedKeys={[location.pathname]} mode="horizontal">
         <Menu.Item key="/">
           <Link to="/">
             <PageHeader title={title} subTitle={subTitle} style={{ cursor: "pointer" }} />  
