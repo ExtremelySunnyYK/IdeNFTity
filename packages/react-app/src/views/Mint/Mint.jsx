@@ -1,14 +1,8 @@
-import { React, useRef, useEffect, useState, useCallback } from "react";
-import { useThemeSwitcher } from "react-css-theme-switcher";
-import { Alert, Typography, Button, Col, Menu, Row, Input, Form } from "antd";
-import { useContractConfig } from "../../hooks";
-// import  { Title } from Typography;
-import { INFURA_ID, NETWORK, NETWORKS } from "../../constants";
-import { Transactor } from "../../helpers";
 import Portis from "@portis/web3";
 import WalletConnectProvider from "@walletconnect/web3-provider";
+import { Alert, Typography, Button, Col, Menu, Row, Input, Form } from "antd";
+import "antd/dist/antd.css";
 import Authereum from "authereum";
-import Fortmatic from "fortmatic";
 import {
   useBalance,
   useContractLoader,
@@ -19,14 +13,28 @@ import {
 } from "eth-hooks";
 import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
 import { useEventListener } from "eth-hooks/events/useEventListener";
+import Fortmatic from "fortmatic";
+// https://www.npmjs.com/package/ipfs-http-client
+// import { create } from "ipfs-http-client";
+import { React, useRef, useEffect, useState, useCallback } from "react";
+// import ReactJson from "react-json-view";
+import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
+//import Torus from "@toruslabs/torus-embed"
 import WalletLink from "walletlink";
 import Web3Modal from "web3modal";
+import { INFURA_ID, NETWORK, NETWORKS } from "../../constants";
+import { Transactor } from "../../helpers";
+import { useContractConfig } from "../../hooks";
+// import Hints from "./Hints";
 
 const { BufferList } = require("bl");
 const ipfsAPI = require("ipfs-http-client");
 const ipfs = ipfsAPI.create({ host: "ipfs.infura.io", port: "5001", protocol: "https" });
-
+console.log("ipfs")
+console.log(ipfs)
 const { ethers } = require("ethers");
+
+
 /// 📡 What chain are your contracts deployed to?
 const targetNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
@@ -140,326 +148,330 @@ const web3Modal = new Web3Modal({
   },
 });
 
-export default function MintPage({}) {
-  const mainnetProvider =
-    poktMainnetProvider && poktMainnetProvider._isProvider
-      ? poktMainnetProvider
-      : scaffoldEthProvider && scaffoldEthProvider._network
-      ? scaffoldEthProvider
-      : mainnetInfura;
+export default function MintPage({
+  tx,
+  writeContracts,
+  address
+}) {
+  // const mainnetProvider =
+  //   poktMainnetProvider && poktMainnetProvider._isProvider
+  //     ? poktMainnetProvider
+  //     : scaffoldEthProvider && scaffoldEthProvider._network
+  //     ? scaffoldEthProvider
+  //     : mainnetInfura;
 
-  const [injectedProvider, setInjectedProvider] = useState();
-  const [address, setAddress] = useState();
+  // const [injectedProvider, setInjectedProvider] = useState();
+  // const [address, setAddress] = useState();
 
-  const logoutOfWeb3Modal = async () => {
-    await web3Modal.clearCachedProvider();
-    if (injectedProvider && injectedProvider.provider && typeof injectedProvider.provider.disconnect == "function") {
-      await injectedProvider.provider.disconnect();
-    }
-    setTimeout(() => {
-      window.location.reload();
-    }, 1);
-  };
+  // const logoutOfWeb3Modal = async () => {
+  //   await web3Modal.clearCachedProvider();
+  //   if (injectedProvider && injectedProvider.provider && typeof injectedProvider.provider.disconnect == "function") {
+  //     await injectedProvider.provider.disconnect();
+  //   }
+  //   setTimeout(() => {
+  //     window.location.reload();
+  //   }, 1);
+  // };
 
-  /* 💵 This hook will get the price of ETH from 🦄 Uniswap: */
-  const price = useExchangeEthPrice(targetNetwork, mainnetProvider);
+  // /* 💵 This hook will get the price of ETH from 🦄 Uniswap: */
+  // const price = useExchangeEthPrice(targetNetwork, mainnetProvider);
 
-  /* 🔥 This hook will get the price of Gas from ⛽️ EtherGasStation */
-  const gasPrice = useGasPrice(targetNetwork, "fast");
-  // Use your injected provider from 🦊 Metamask or if you don't have it then instantly generate a 🔥 burner wallet.
-  const userProviderAndSigner = useUserProviderAndSigner(injectedProvider, localProvider);
-  const userSigner = userProviderAndSigner.signer;
+  // /* 🔥 This hook will get the price of Gas from ⛽️ EtherGasStation */
+  // const gasPrice = useGasPrice(targetNetwork, "fast");
+  // // Use your injected provider from 🦊 Metamask or if you don't have it then instantly generate a 🔥 burner wallet.
+  // const userProviderAndSigner = useUserProviderAndSigner(injectedProvider, localProvider);
+  // const userSigner = userProviderAndSigner.signer;
+  // console.log("userSigner")
+  // console.log(userSigner)
+  // useEffect(() => {
+  //   async function getAddress() {
+  //     if (userSigner) {
+  //       const newAddress = await userSigner.getAddress();
+  //       setAddress(newAddress);
+  //     }
+  //   }
+  //   getAddress();
+  // }, [userSigner]);
 
-  useEffect(() => {
-    async function getAddress() {
-      if (userSigner) {
-        const newAddress = await userSigner.getAddress();
-        setAddress(newAddress);
-      }
-    }
-    getAddress();
-  }, [userSigner]);
+  // // You can warn the user if you would like them to be on a specific network
+  // const localChainId = localProvider && localProvider._network && localProvider._network.chainId;
+  // const selectedChainId =
+  //   userSigner && userSigner.provider && userSigner.provider._network && userSigner.provider._network.chainId;
 
-  // You can warn the user if you would like them to be on a specific network
-  const localChainId = localProvider && localProvider._network && localProvider._network.chainId;
-  const selectedChainId =
-    userSigner && userSigner.provider && userSigner.provider._network && userSigner.provider._network.chainId;
+  // // For more hooks, check out 🔗eth-hooks at: https://www.npmjs.com/package/eth-hooks
 
-  // For more hooks, check out 🔗eth-hooks at: https://www.npmjs.com/package/eth-hooks
+  // // The transactor wraps transactions and provides notificiations
+  // const tx = Transactor(userSigner, gasPrice);
+  // console.log("tx")
+  // console.log(tx)
 
-  // The transactor wraps transactions and provides notificiations
-  const tx = Transactor(userSigner, gasPrice);
-  console.log("tx")
-  console.log(tx)
+  // // Faucet Tx can be used to send funds from the faucet
+  // const faucetTx = Transactor(localProvider, gasPrice);
 
+  // // 🏗 scaffold-eth is full of handy hooks like this one to get your balance:
+  // const yourLocalBalance = useBalance(localProvider, address);
 
-  // Faucet Tx can be used to send funds from the faucet
-  const faucetTx = Transactor(localProvider, gasPrice);
+  // // Just plug in different 🛰 providers to get your balance on different chains:
+  // const yourMainnetBalance = useBalance(mainnetProvider, address);
 
-  // 🏗 scaffold-eth is full of handy hooks like this one to get your balance:
-  const yourLocalBalance = useBalance(localProvider, address);
+  // const contractConfig = useContractConfig();
 
-  // Just plug in different 🛰 providers to get your balance on different chains:
-  const yourMainnetBalance = useBalance(mainnetProvider, address);
+  // // Load in your local 📝 contract and read a value from it:
+  // const readContracts = useContractLoader(localProvider, contractConfig);
 
-  const contractConfig = useContractConfig();
+  // // If you want to make 🔐 write transactions to your contracts, use the userSigner:
+  // const writeContracts = useContractLoader(userSigner, contractConfig, localChainId);
 
-  // Load in your local 📝 contract and read a value from it:
-  const readContracts = useContractLoader(localProvider, contractConfig);
+  // // EXTERNAL CONTRACT EXAMPLE:
+  // //
+  // // If you want to bring in the mainnet DAI contract it would look like:
+  // const mainnetContracts = useContractLoader(mainnetProvider, contractConfig);
 
-  // If you want to make 🔐 write transactions to your contracts, use the userSigner:
-  const writeContracts = useContractLoader(userSigner, contractConfig, localChainId);
+  // // If you want to call a function on a new block
+  // useOnBlock(mainnetProvider, () => {
+  //   console.log(`⛓ A new mainnet block is here: ${mainnetProvider._lastBlockNumber}`);
+  // });
 
-  // EXTERNAL CONTRACT EXAMPLE:
-  //
-  // If you want to bring in the mainnet DAI contract it would look like:
-  const mainnetContracts = useContractLoader(mainnetProvider, contractConfig);
+  // // Then read your DAI balance like:
+  // const myMainnetDAIBalance = useContractReader(mainnetContracts, "DAI", "balanceOf", [
+  //   "0x34aA3F359A9D614239015126635CE7732c18fDF3",
+  // ]);
 
-  // If you want to call a function on a new block
-  useOnBlock(mainnetProvider, () => {
-    console.log(`⛓ A new mainnet block is here: ${mainnetProvider._lastBlockNumber}`);
-  });
+  // // keep track of a variable from the contract in the local React state:
+  // const balance = useContractReader(readContracts, "YourCollectible", "balanceOf", [address]);
+  // console.log("🤗 balance:", balance);
 
-  // Then read your DAI balance like:
-  const myMainnetDAIBalance = useContractReader(mainnetContracts, "DAI", "balanceOf", [
-    "0x34aA3F359A9D614239015126635CE7732c18fDF3",
-  ]);
+  // // 📟 Listen for broadcast events
+  // const transferEvents = useEventListener(readContracts, "YourCollectible", "Transfer", localProvider, 1);
+  // console.log("📟 Transfer events:", transferEvents);
 
-  // keep track of a variable from the contract in the local React state:
-  const balance = useContractReader(readContracts, "YourCollectible", "balanceOf", [address]);
-  console.log("🤗 balance:", balance);
+  // //
+  // // 🧠 This effect will update yourCollectibles by polling when your balance changes
+  // //
+  // const yourBalance = balance && balance.toNumber && balance.toNumber();
+  // const [yourCollectibles, setYourCollectibles] = useState();
 
-  // 📟 Listen for broadcast events
-  const transferEvents = useEventListener(readContracts, "YourCollectible", "Transfer", localProvider, 1);
-  console.log("📟 Transfer events:", transferEvents);
+  // useEffect(() => {
+  //   const updateYourCollectibles = async () => {
+  //     const collectibleUpdate = [];
+  //     for (let tokenIndex = 0; tokenIndex < balance; tokenIndex++) {
+  //       try {
+  //         console.log("GEtting token index", tokenIndex);
+  //         const tokenId = await readContracts.YourCollectible.tokenOfOwnerByIndex(address, tokenIndex);
+  //         console.log("tokenId", tokenId);
+  //         const tokenURI = await readContracts.YourCollectible.tokenURI(tokenId);
+  //         console.log("tokenURI", tokenURI);
 
-  //
-  // 🧠 This effect will update yourCollectibles by polling when your balance changes
-  //
-  const yourBalance = balance && balance.toNumber && balance.toNumber();
-  const [yourCollectibles, setYourCollectibles] = useState();
+  //         const ipfsHash = tokenURI.replace("https://ipfs.io/ipfs/", "");
+  //         console.log("ipfsHash", ipfsHash);
 
-  useEffect(() => {
-    const updateYourCollectibles = async () => {
-      const collectibleUpdate = [];
-      for (let tokenIndex = 0; tokenIndex < balance; tokenIndex++) {
-        try {
-          console.log("GEtting token index", tokenIndex);
-          const tokenId = await readContracts.YourCollectible.tokenOfOwnerByIndex(address, tokenIndex);
-          console.log("tokenId", tokenId);
-          const tokenURI = await readContracts.YourCollectible.tokenURI(tokenId);
-          console.log("tokenURI", tokenURI);
+  //         const jsonManifestBuffer = await getFromIPFS(ipfsHash);
 
-          const ipfsHash = tokenURI.replace("https://ipfs.io/ipfs/", "");
-          console.log("ipfsHash", ipfsHash);
+  //         try {
+  //           const jsonManifest = JSON.parse(jsonManifestBuffer.toString());
+  //           console.log("jsonManifest", jsonManifest);
+  //           collectibleUpdate.push({ id: tokenId, uri: tokenURI, owner: address, ...jsonManifest });
+  //         } catch (e) {
+  //           console.log(e);
+  //         }
+  //       } catch (e) {
+  //         console.log(e);
+  //       }
+  //     }
+  //     setYourCollectibles(collectibleUpdate);
+  //   };
+  //   updateYourCollectibles();
+  // }, [address, yourBalance]);
 
-          const jsonManifestBuffer = await getFromIPFS(ipfsHash);
+  // /*
+  // const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");
+  // console.log("🏷 Resolved austingriffith.eth as:",addressFromENS)
+  // */
 
-          try {
-            const jsonManifest = JSON.parse(jsonManifestBuffer.toString());
-            console.log("jsonManifest", jsonManifest);
-            collectibleUpdate.push({ id: tokenId, uri: tokenURI, owner: address, ...jsonManifest });
-          } catch (e) {
-            console.log(e);
-          }
-        } catch (e) {
-          console.log(e);
-        }
-      }
-      setYourCollectibles(collectibleUpdate);
-    };
-    updateYourCollectibles();
-  }, [address, yourBalance]);
+  // //
+  // // 🧫 DEBUG 👨🏻‍🔬
+  // //
+  // useEffect(() => {
+  //   if (
+  //     DEBUG &&
+  //     mainnetProvider &&
+  //     address &&
+  //     selectedChainId &&
+  //     yourLocalBalance &&
+  //     yourMainnetBalance &&
+  //     readContracts &&
+  //     writeContracts &&
+  //     mainnetContracts
+  //   ) {
+  //     console.log("_____________________________________ 🏗 scaffold-eth _____________________________________");
+  //     console.log("🌎 mainnetProvider", mainnetProvider);
+  //     console.log("🏠 localChainId", localChainId);
+  //     console.log("👩‍💼 selected address:", address);
+  //     console.log("🕵🏻‍♂️ selectedChainId:", selectedChainId);
+  //     console.log("💵 yourLocalBalance", yourLocalBalance ? ethers.utils.formatEther(yourLocalBalance) : "...");
+  //     console.log("💵 yourMainnetBalance", yourMainnetBalance ? ethers.utils.formatEther(yourMainnetBalance) : "...");
+  //     console.log("📝 readContracts", readContracts);
+  //     console.log("🌍 DAI contract on mainnet:", mainnetContracts);
+  //     console.log("💵 yourMainnetDAIBalance", myMainnetDAIBalance);
+  //     console.log("🔐 writeContracts", writeContracts);
+  //   }
+  // }, [
+  //   mainnetProvider,
+  //   address,
+  //   selectedChainId,
+  //   yourLocalBalance,
+  //   yourMainnetBalance,
+  //   readContracts,
+  //   writeContracts,
+  //   mainnetContracts,
+  // ]);
 
-  /*
-  const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");
-  console.log("🏷 Resolved austingriffith.eth as:",addressFromENS)
-  */
+  // let networkDisplay = "";
+  // if (NETWORKCHECK && localChainId && selectedChainId && localChainId !== selectedChainId) {
+  //   const networkSelected = NETWORK(selectedChainId);
+  //   const networkLocal = NETWORK(localChainId);
+  //   if (selectedChainId === 1337 && localChainId === 31337) {
+  //     networkDisplay = (
+  //       <div style={{ zIndex: 2, position: "absolute", right: 0, top: 60, padding: 16 }}>
+  //         <Alert
+  //           message="⚠️ Wrong Network ID"
+  //           description={
+  //             <div>
+  //               You have <b>chain id 1337</b> for localhost and you need to change it to <b>31337</b> to work with
+  //               HardHat.
+  //               <div>(MetaMask -&gt; Settings -&gt; Networks -&gt; Chain ID -&gt; 31337)</div>
+  //             </div>
+  //           }
+  //           type="error"
+  //           closable={false}
+  //         />
+  //       </div>
+  //     );
+  //   } else {
+  //     networkDisplay = (
+  //       <div style={{ zIndex: 2, position: "absolute", right: 0, top: 60, padding: 16 }}>
+  //         <Alert
+  //           message="⚠️ Wrong Network"
+  //           description={
+  //             <div>
+  //               You have <b>{networkSelected && networkSelected.name}</b> selected and you need to be on{" "}
+  //               <Button
+  //                 onClick={async () => {
+  //                   const ethereum = window.ethereum;
+  //                   const data = [
+  //                     {
+  //                       chainId: "0x" + targetNetwork.chainId.toString(16),
+  //                       chainName: targetNetwork.name,
+  //                       nativeCurrency: targetNetwork.nativeCurrency,
+  //                       rpcUrls: [targetNetwork.rpcUrl],
+  //                       blockExplorerUrls: [targetNetwork.blockExplorer],
+  //                     },
+  //                   ];
+  //                   console.log("data", data);
 
-  //
-  // 🧫 DEBUG 👨🏻‍🔬
-  //
-  useEffect(() => {
-    if (
-      DEBUG &&
-      mainnetProvider &&
-      address &&
-      selectedChainId &&
-      yourLocalBalance &&
-      yourMainnetBalance &&
-      readContracts &&
-      writeContracts &&
-      mainnetContracts
-    ) {
-      console.log("_____________________________________ 🏗 scaffold-eth _____________________________________");
-      console.log("🌎 mainnetProvider", mainnetProvider);
-      console.log("🏠 localChainId", localChainId);
-      console.log("👩‍💼 selected address:", address);
-      console.log("🕵🏻‍♂️ selectedChainId:", selectedChainId);
-      console.log("💵 yourLocalBalance", yourLocalBalance ? ethers.utils.formatEther(yourLocalBalance) : "...");
-      console.log("💵 yourMainnetBalance", yourMainnetBalance ? ethers.utils.formatEther(yourMainnetBalance) : "...");
-      console.log("📝 readContracts", readContracts);
-      console.log("🌍 DAI contract on mainnet:", mainnetContracts);
-      console.log("💵 yourMainnetDAIBalance", myMainnetDAIBalance);
-      console.log("🔐 writeContracts", writeContracts);
-    }
-  }, [
-    mainnetProvider,
-    address,
-    selectedChainId,
-    yourLocalBalance,
-    yourMainnetBalance,
-    readContracts,
-    writeContracts,
-    mainnetContracts,
-  ]);
+  //                   let switchTx;
+  //                   // https://docs.metamask.io/guide/rpc-api.html#other-rpc-methods
+  //                   try {
+  //                     switchTx = await ethereum.request({
+  //                       method: "wallet_switchEthereumChain",
+  //                       params: [{ chainId: data[0].chainId }],
+  //                     });
+  //                   } catch (switchError) {
+  //                     // not checking specific error code, because maybe we're not using MetaMask
+  //                     try {
+  //                       switchTx = await ethereum.request({
+  //                         method: "wallet_addEthereumChain",
+  //                         params: data,
+  //                       });
+  //                     } catch (addError) {
+  //                       // handle "add" error
+  //                     }
+  //                   }
 
-  let networkDisplay = "";
-  if (NETWORKCHECK && localChainId && selectedChainId && localChainId !== selectedChainId) {
-    const networkSelected = NETWORK(selectedChainId);
-    const networkLocal = NETWORK(localChainId);
-    if (selectedChainId === 1337 && localChainId === 31337) {
-      networkDisplay = (
-        <div style={{ zIndex: 2, position: "absolute", right: 0, top: 60, padding: 16 }}>
-          <Alert
-            message="⚠️ Wrong Network ID"
-            description={
-              <div>
-                You have <b>chain id 1337</b> for localhost and you need to change it to <b>31337</b> to work with
-                HardHat.
-                <div>(MetaMask -&gt; Settings -&gt; Networks -&gt; Chain ID -&gt; 31337)</div>
-              </div>
-            }
-            type="error"
-            closable={false}
-          />
-        </div>
-      );
-    } else {
-      networkDisplay = (
-        <div style={{ zIndex: 2, position: "absolute", right: 0, top: 60, padding: 16 }}>
-          <Alert
-            message="⚠️ Wrong Network"
-            description={
-              <div>
-                You have <b>{networkSelected && networkSelected.name}</b> selected and you need to be on{" "}
-                <Button
-                  onClick={async () => {
-                    const ethereum = window.ethereum;
-                    const data = [
-                      {
-                        chainId: "0x" + targetNetwork.chainId.toString(16),
-                        chainName: targetNetwork.name,
-                        nativeCurrency: targetNetwork.nativeCurrency,
-                        rpcUrls: [targetNetwork.rpcUrl],
-                        blockExplorerUrls: [targetNetwork.blockExplorer],
-                      },
-                    ];
-                    console.log("data", data);
+  //                   if (switchTx) {
+  //                     console.log(switchTx);
+  //                   }
+  //                 }}
+  //               >
+  //                 <b>{networkLocal && networkLocal.name}</b>
+  //               </Button>
+  //             </div>
+  //           }
+  //           type="error"
+  //           closable={false}
+  //         />
+  //       </div>
+  //     );
+  //   }
+  // } else {
+  //   networkDisplay = (
+  //     <div style={{ zIndex: -1, position: "absolute", right: 154, top: 28, padding: 16, color: targetNetwork.color }}>
+  //       {targetNetwork.name}
+  //     </div>
+  //   );
+  // }
 
-                    let switchTx;
-                    // https://docs.metamask.io/guide/rpc-api.html#other-rpc-methods
-                    try {
-                      switchTx = await ethereum.request({
-                        method: "wallet_switchEthereumChain",
-                        params: [{ chainId: data[0].chainId }],
-                      });
-                    } catch (switchError) {
-                      // not checking specific error code, because maybe we're not using MetaMask
-                      try {
-                        switchTx = await ethereum.request({
-                          method: "wallet_addEthereumChain",
-                          params: data,
-                        });
-                      } catch (addError) {
-                        // handle "add" error
-                      }
-                    }
+  // const loadWeb3Modal = useCallback(async () => {
+  //   const provider = await web3Modal.connect();
+  //   setInjectedProvider(new ethers.providers.Web3Provider(provider));
 
-                    if (switchTx) {
-                      console.log(switchTx);
-                    }
-                  }}
-                >
-                  <b>{networkLocal && networkLocal.name}</b>
-                </Button>
-              </div>
-            }
-            type="error"
-            closable={false}
-          />
-        </div>
-      );
-    }
-  } else {
-    networkDisplay = (
-      <div style={{ zIndex: -1, position: "absolute", right: 154, top: 28, padding: 16, color: targetNetwork.color }}>
-        {targetNetwork.name}
-      </div>
-    );
-  }
+  //   provider.on("chainChanged", chainId => {
+  //     console.log(`chain changed to ${chainId}! updating providers`);
+  //     setInjectedProvider(new ethers.providers.Web3Provider(provider));
+  //   });
 
-  const loadWeb3Modal = useCallback(async () => {
-    const provider = await web3Modal.connect();
-    setInjectedProvider(new ethers.providers.Web3Provider(provider));
+  //   provider.on("accountsChanged", () => {
+  //     console.log(`account changed!`);
+  //     setInjectedProvider(new ethers.providers.Web3Provider(provider));
+  //   });
 
-    provider.on("chainChanged", chainId => {
-      console.log(`chain changed to ${chainId}! updating providers`);
-      setInjectedProvider(new ethers.providers.Web3Provider(provider));
-    });
+  //   // Subscribe to session disconnection
+  //   provider.on("disconnect", (code, reason) => {
+  //     console.log(code, reason);
+  //     logoutOfWeb3Modal();
+  //   });
+  // }, [setInjectedProvider]);
 
-    provider.on("accountsChanged", () => {
-      console.log(`account changed!`);
-      setInjectedProvider(new ethers.providers.Web3Provider(provider));
-    });
+  // useEffect(() => {
+  //   if (web3Modal.cachedProvider) {
+  //     loadWeb3Modal();
+  //   }
+  // }, [loadWeb3Modal]);
 
-    // Subscribe to session disconnection
-    provider.on("disconnect", (code, reason) => {
-      console.log(code, reason);
-      logoutOfWeb3Modal();
-    });
-  }, [setInjectedProvider]);
+  // const [route, setRoute] = useState();
+  // useEffect(() => {
+  //   setRoute(window.location.pathname);
+  // }, [setRoute]);
 
-  useEffect(() => {
-    if (web3Modal.cachedProvider) {
-      loadWeb3Modal();
-    }
-  }, [loadWeb3Modal]);
+  // let faucetHint = "";
+  // const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
 
-  const [route, setRoute] = useState();
-  useEffect(() => {
-    setRoute(window.location.pathname);
-  }, [setRoute]);
-
-  let faucetHint = "";
-  const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
-
-  const [faucetClicked, setFaucetClicked] = useState(false);
-  if (
-    !faucetClicked &&
-    localProvider &&
-    localProvider._network &&
-    localProvider._network.chainId == 31337 &&
-    yourLocalBalance &&
-    ethers.utils.formatEther(yourLocalBalance) <= 0
-  ) {
-    faucetHint = (
-      <div style={{ padding: 16 }}>
-        <Button
-          type="primary"
-          onClick={() => {
-            faucetTx({
-              to: address,
-              value: ethers.utils.parseEther("0.01"),
-            });
-            setFaucetClicked(true);
-          }}
-        >
-          💰 Grab funds from the faucet ⛽️
-        </Button>
-      </div>
-    );
-  }
+  // const [faucetClicked, setFaucetClicked] = useState(false);
+  // if (
+  //   !faucetClicked &&
+  //   localProvider &&
+  //   localProvider._network &&
+  //   localProvider._network.chainId == 31337 &&
+  //   yourLocalBalance &&
+  //   ethers.utils.formatEther(yourLocalBalance) <= 0
+  // ) {
+  //   faucetHint = (
+  //     <div style={{ padding: 16 }}>
+  //       <Button
+  //         type="primary"
+  //         onClick={() => {
+  //           faucetTx({
+  //             to: address,
+  //             value: ethers.utils.parseEther("0.01"),
+  //           });
+  //           setFaucetClicked(true);
+  //         }}
+  //       >
+  //         💰 Grab funds from the faucet ⛽️
+  //       </Button>
+  //     </div>
+  //   );
+  // }
 
   const [yourJSON, setYourJSON] = useState({});
   const [sending, setSending] = useState();
