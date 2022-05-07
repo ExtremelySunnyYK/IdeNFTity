@@ -1,18 +1,27 @@
-import { PageHeader } from "antd";
+import { PageHeader, Menu } from "antd";
 import React from "react";
+import { Link, Route, Switch, useLocation } from "react-router-dom";
 
 // displays a page header
 
 export default function Header({ link, title, subTitle }) {
+  const location = useLocation();
   return (
-    <a href={link} target="_blank" rel="noopener noreferrer">
-      <PageHeader title={title} subTitle={subTitle} style={{ cursor: "pointer" }} />
-    </a>
+    <Menu style={{ }} selectedKeys={[location.pathname]} mode="horizontal">
+        <Menu.Item key="/">
+          <Link to="/">
+            <PageHeader title={title} subTitle={subTitle} style={{ cursor: "pointer" }} />  
+          </Link>
+        </Menu.Item>
+        <Menu.Item key="/debug">
+          <Link to="/debug">Debug Contracts</Link>
+        </Menu.Item>
+    </Menu>
   );
 }
 
 Header.defaultProps = {
-  link: "https://github.com/austintgriffith/scaffold-eth",
-  title: "🏗 scaffold-eth",
-  subTitle: "forkable Ethereum dev stack focused on fast product iteration",
+  link: "/",
+  title: "👾 IdeNFTity",
+  subTitle: "🖌	Paint you digital identity with us",
 };
