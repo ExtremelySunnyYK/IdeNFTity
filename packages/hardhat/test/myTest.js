@@ -1,40 +1,87 @@
-const { ethers } = require("hardhat");
+//
+// this script executes when you run 'yarn test'
+//
+// you can also test remote submissions like:
+// CONTRACT_ADDRESS=0x43Ab1FCd430C1f20270C2470f857f7a006117bbb yarn test --network rinkeby
+//
+// you can even run mint commands if the tests pass like:
+// yarn test && echo "PASSED" || echo "FAILED"
+//
+
+const hre = require("hardhat");
+
+const { ethers } = hre;
 const { use, expect } = require("chai");
 const { solidity } = require("ethereum-waffle");
 
 use(solidity);
 
-describe("My Dapp", function () {
+describe("🚩 Challenge 0: 🎟 Simple NFT Example 🤓", function () {
+  this.timeout(120000);
+
   let myContract;
 
-  // quick fix to let gas reporter fetch data from gas station & coinmarketcap
-  before((done) => {
-    setTimeout(done, 2000);
-  });
+  // console.log("hre:",Object.keys(hre)) // <-- you can access the hardhat runtime env here
 
-  describe("YourContract", function () {
-    it("Should deploy YourContract", async function () {
-      const YourContract = await ethers.getContractFactory("YourContract");
-
-      myContract = await YourContract.deploy();
-    });
-
-    describe("setPurpose()", function () {
-      it("Should be able to set a new purpose", async function () {
-        const newPurpose = "Test Purpose";
-
-        await myContract.setPurpose(newPurpose);
-        expect(await myContract.purpose()).to.equal(newPurpose);
+  describe("YourCollectible", function () {
+    if (process.env.CONTRACT_ADDRESS) {
+      it("Should connect to external contract", async function () {
+        myContract = await ethers.getContractAt(
+          "YourCollectible",
+          process.env.CONTRACT_ADDRESS
+        );
+        console.log(
+          "     🛰 Connected to external contract",
+          myContract.address
+        );
       });
+    } else {
+      it("Should deploy YourCollectible", async function () {
+        const YourCollectible = await ethers.getContractFactory(
+          "YourCollectible"
+        );
+        myContract = await YourCollectible.deploy();
+      });
+    }
 
-      it("Should emit a SetPurpose event ", async function () {
+    describe("mintItem()", function () {
+      it("Should be able to mint an NFT", async function () {
         const [owner] = await ethers.getSigners();
 
-        const newPurpose = "Another Test Purpose";
+        console.log("\t", " 🧑‍🏫 Tester Address: ", owner.address);
 
-        expect(await myContract.setPurpose(newPurpose))
-          .to.emit(myContract, "SetPurpose")
-          .withArgs(owner.address, newPurpose);
+        const startingBalance = await myContract.balanceOf(owner.address);
+        console.log("\t", " ⚖️ Starting balance: ", startingBalance.toNumber());
+
+        console.log("\t", " 🔨 Minting...");
+        const mintResult = await myContract.mintItem(
+          owner.address,
+          "QmfVMAmNM1kDEBYrC2TPzQDoCRFH6F5tE1e9Mr4FkkR5Xr"
+        );
+        console.log("\t", " 🏷  mint tx: ", mintResult.hash);
+
+        console.log("\t", " ⏳ Waiting for confirmation...");
+        const txResult = await mintResult.wait(2);
+        expect(txResult.status).to.equal(1);
+
+        console.log(
+          "\t",
+          " 🔎 Checking new balance: ",
+          startingBalance.toNumber()
+        );
+        expect(await myContract.balanceOf(owner.address)).to.equal(
+          startingBalance.add(1)
+        );
+      });
+
+      it("Should track tokens of owner by index", async function () {
+        const [owner] = await ethers.getSigners();
+        const startingBalance = await myContract.balanceOf(owner.address);
+        const token = await myContract.tokenOfOwnerByIndex(
+          owner.address,
+          startingBalance.sub(1)
+        );
+        expect(token.toNumber()).to.greaterThan(0);
       });
     });
   });

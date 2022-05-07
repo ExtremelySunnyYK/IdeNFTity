@@ -2,7 +2,7 @@ import { useContractReader } from "eth-hooks";
 import { ethers } from "ethers";
 import React from "react";
 import { Link } from "react-router-dom";
-import {  Typography, Button, Col, Menu, Row  } from "antd";
+import { Typography, Button, Col, Menu, Row } from "antd";
 
 /**
  * web3 props can be passed from '../App.jsx' into your local view component for use
@@ -11,8 +11,6 @@ import {  Typography, Button, Col, Menu, Row  } from "antd";
  * @returns react component
  **/
 function Home({ yourLocalBalance, readContracts }) {
-  // you can also use hooks locally in your component of choice
-  // in this case, let's keep track of 'purpose' variable from our contract
   const purpose = useContractReader(readContracts, "YourContract", "purpose");
 
   return (
@@ -20,18 +18,17 @@ function Home({ yourLocalBalance, readContracts }) {
       <div className="logos"></div>
       <div className="logos"></div>
       <div className="logos"></div>
-      <Button
-        onClick={() => {
-          window.open("https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA");
-        }}
-        size="large"
-        shape="round"
-      >
-        <span style={{ marginRight: 8 }} role="img" aria-label="support">
-          💬
-        </span>
-        Mint Now!
-      </Button>
+      <Link to="/mint">
+        <Button
+          size="large"
+          shape="round"
+        >
+          <span style={{ marginRight: 8 }} role="img" aria-label="support">
+            💬
+          </span>
+          Mint Now!
+        </Button>
+      </Link>
     </div>
   );
 }
