@@ -11,7 +11,7 @@ Prerequisites: [Node (v16 LTS)](https://nodejs.org/en/download/) plus [Yarn](htt
 > clone/fork 🏗 :
 
 ```bash
-git clone https://github.com/ExtremelySunnyYK/identity-nft.git
+git clone https://github.com/ExtremelySunnyYK/IdeNFTity.git
 ```
 
 > install and start the 👷‍ Hardhat chain:
